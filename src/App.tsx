@@ -9,6 +9,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import PosLayout from "./layouts/PosLayout";
+import PosScreen from "./pages/PosScreen";
+import Products from "./pages/Products";
+import Inventory from "./pages/Inventory";
+import Shifts from "./pages/Shifts";
+import Reports from "./pages/Reports";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +35,20 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/pos"
+              element={
+                <ProtectedRoute>
+                  <PosLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<PosScreen />} />
+              <Route path="products" element={<Products />} />
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="shifts" element={<Shifts />} />
+              <Route path="reports" element={<Reports />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
