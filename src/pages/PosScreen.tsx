@@ -15,7 +15,7 @@ import {
 import { 
   Tabs, TabsContent, TabsList, TabsTrigger 
 } from "@/components/ui/tabs";
-import { Search, Trash2, PlusCircle, MinusCircle, Printer, CreditCard, Banknote } from "lucide-react";
+import { Search, Trash2, PlusCircle, MinusCircle, ShoppingCart, Printer } from "lucide-react";
 import { StartShiftDialog } from "@/components/StartShiftDialog";
 import { ReceiptDialog } from "@/components/ReceiptDialog";
 import { Badge } from "@/components/ui/badge";
@@ -210,7 +210,7 @@ const PosScreen = () => {
     return calculateTotal() + calculateTax();
   };
 
-  const handleCheckout = async (paymentMethod: string) => {
+  const handleCheckout = async () => {
     if (!activeShift) {
       toast.error("You need to start a shift first");
       setIsStartShiftDialogOpen(true);
@@ -234,6 +234,7 @@ const PosScreen = () => {
       const receipt_number = receiptData;
       const total_amount = calculateGrandTotal();
       const tax_amount = calculateTax();
+      const payment_method = "cash"; // Default payment method
       
       const { data: saleData, error: saleError } = await supabase
         .from('sales')
@@ -242,7 +243,7 @@ const PosScreen = () => {
           user_id: user?.id,
           total_amount,
           tax_amount,
-          payment_method: paymentMethod,
+          payment_method,
           receipt_number
         })
         .select('*')
@@ -325,6 +326,31 @@ const PosScreen = () => {
       toast.error("An error occurred during checkout");
       console.error(error);
     }
+  };
+
+  const handlePrint = () => {
+    if (cart.length === 0) {
+      toast.error("Cart is empty");
+      return;
+    }
+    
+    const mockSale = {
+      id: "preview",
+      receipt_number: "PREVIEW",
+      total_amount: calculateGrandTotal(),
+      tax_amount: calculateTax(),
+      payment_method: "preview",
+      created_at: new Date().toISOString(),
+      items: cart.map(item => ({
+        product_name: item.product.name,
+        quantity: item.quantity,
+        unit_price: item.product.price,
+        subtotal: item.subtotal
+      }))
+    };
+    
+    setCompletedSale(mockSale);
+    setIsReceiptDialogOpen(true);
   };
 
   return (
@@ -492,19 +518,19 @@ const PosScreen = () => {
                 <Button 
                   className="w-full" 
                   variant="outline"
-                  onClick={() => handleCheckout('cash')}
-                  disabled={cart.length === 0 || !activeShift}
+                  onClick={handlePrint}
+                  disabled={cart.length === 0}
                 >
-                  <Banknote className="mr-2 h-4 w-4" />
-                  Cash
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print
                 </Button>
                 <Button 
                   className="w-full" 
-                  onClick={() => handleCheckout('card')}
+                  onClick={handleCheckout}
                   disabled={cart.length === 0 || !activeShift}
                 >
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Card
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Checkout
                 </Button>
               </div>
             </CardFooter>
