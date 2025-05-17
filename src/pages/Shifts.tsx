@@ -66,8 +66,8 @@ const Shifts = () => {
         throw salesError;
       }
       
-      const totalSales = salesData.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0);
-      const expectedCash = parseFloat(shiftData.starting_cash) + totalSales;
+      const totalSales = salesData.reduce((sum, sale) => sum + parseFloat(sale.total_amount.toString()), 0);
+      const expectedCash = parseFloat(shiftData.starting_cash.toString()) + totalSales;
       
       // Prompt for closing cash amount
       const closingCash = prompt("Enter closing cash amount:", expectedCash.toFixed(2));

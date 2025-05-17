@@ -72,7 +72,7 @@ const Reports = () => {
       if (!acc[date]) {
         acc[date] = { date, total: 0, count: 0 };
       }
-      acc[date].total += parseFloat(sale.total_amount);
+      acc[date].total += parseFloat(sale.total_amount.toString());
       acc[date].count += 1;
       return acc;
     }, {});
@@ -87,7 +87,7 @@ const Reports = () => {
       if (!acc[method]) {
         acc[method] = { name: method === 'card' ? 'Credit/Debit Card' : 'Cash', value: 0 };
       }
-      acc[method].value += parseFloat(sale.total_amount);
+      acc[method].value += parseFloat(sale.total_amount.toString());
       return acc;
     }, {});
     
@@ -101,7 +101,7 @@ const Reports = () => {
           products[item.product_id] = { id: item.product_id, quantity: 0, revenue: 0 };
         }
         products[item.product_id].quantity += item.quantity;
-        products[item.product_id].revenue += parseFloat(item.subtotal);
+        products[item.product_id].revenue += parseFloat(item.subtotal.toString());
       });
     });
     
@@ -114,7 +114,7 @@ const Reports = () => {
 
   const { dailySales, paymentMethodData, topProducts } = processSalesData();
   
-  const totalSales = salesData?.reduce((total, sale) => total + parseFloat(sale.total_amount), 0) || 0;
+  const totalSales = salesData?.reduce((total, sale) => total + parseFloat(sale.total_amount.toString()), 0) || 0;
   const totalTransactions = salesData?.length || 0;
   const averageTicket = totalTransactions > 0 ? totalSales / totalTransactions : 0;
 
@@ -153,10 +153,13 @@ const Reports = () => {
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
                   <Calendar
-                    mode="month"
+                    mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={(selectedDate) => {
+                      if (selectedDate) setDate(selectedDate);
+                    }}
                     initialFocus
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
