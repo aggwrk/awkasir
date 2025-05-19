@@ -61,6 +61,7 @@ export const useCheckout = (
       
       if (receiptError) {
         toast.error("Failed to generate receipt number");
+        console.error(receiptError);
         return false;
       }
       
@@ -103,6 +104,7 @@ export const useCheckout = (
       
       if (itemsError) {
         toast.error("Failed to create sale items");
+        console.error(itemsError);
         return false;
       }
       
@@ -121,6 +123,7 @@ export const useCheckout = (
         
         if (invError) {
           toast.error(`Failed to update inventory for ${item.product.name}`);
+          console.error(invError);
           continue;
         }
         
@@ -134,6 +137,7 @@ export const useCheckout = (
         
         if (stockError) {
           toast.error(`Failed to update stock for ${item.product.name}`);
+          console.error(stockError);
         }
       }
       

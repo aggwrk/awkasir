@@ -7,6 +7,7 @@ import { useCart } from "@/hooks/useCart";
 import { useCheckout } from "@/hooks/useCheckout";
 import { ShiftManager } from "@/components/ShiftManager";
 import { useShift } from "@/contexts/ShiftContext";
+import { toast } from "sonner";
 
 const PosScreen = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +36,11 @@ const PosScreen = () => {
   } = useCheckout(cart, calculateGrandTotal, calculateTax, clearCart);
 
   const onCheckout = async () => {
+    if (!activeShift) {
+      toast.error("You need to start a shift first");
+      return;
+    }
+    
     await handleCheckout(activeShift);
   };
 

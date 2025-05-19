@@ -10,6 +10,7 @@ interface ShiftContextType {
   setIsStartShiftDialogOpen: (open: boolean) => void;
   refetchShift: () => Promise<any>;
   isLoading: boolean;
+  endShift: () => Promise<void>;
 }
 
 const ShiftContext = createContext<ShiftContextType | undefined>(undefined);
@@ -49,12 +50,34 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
     }
   }, [shiftData]);
 
+  const endShift = async () => {
+    if (!activeShift) return;
+
+    try {
+      const { error } = await supabase
+        .from('shifts')
+        .update({
+          status: 'ended',
+          end_time: new Date().toISOString(),
+        })
+        .eq('id', activeShift.id);
+
+      if (error) throw error;
+      
+      await refetchShift();
+      setIsStartShiftDialogOpen(true);
+    } catch (error) {
+      console.error('Error ending shift:', error);
+    }
+  };
+
   const value = {
     activeShift,
     isStartShiftDialogOpen,
     setIsStartShiftDialogOpen,
     refetchShift,
-    isLoading
+    isLoading,
+    endShift
   };
 
   return <ShiftContext.Provider value={value}>{children}</ShiftContext.Provider>;
