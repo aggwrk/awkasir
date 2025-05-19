@@ -34,6 +34,7 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
         .limit(1);
         
       if (error) {
+        console.error("Error fetching active shift:", error);
         return null;
       }
       

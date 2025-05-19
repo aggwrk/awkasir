@@ -33,18 +33,28 @@ export const StartShiftDialog = ({ open, onOpenChange, onSuccess }: StartShiftDi
     setIsLoading(true);
 
     try {
+      // Ensure we're using authenticated user ID
       const { data, error } = await supabase
         .from('shifts')
         .insert({
           user_id: user.id,
           starting_cash: parseFloat(startingCash),
-          status: 'active'
+          status: 'active',
+          start_time: new Date().toISOString()
         })
-        .select()
-        .single();
+        .select();
 
       if (error) {
-        toast.error("Failed to start shift");
+        console.error("Error starting shift:", error);
+        
+        if (error.code === "42501") {
+          toast.error("Permission denied: Make sure you have the right permissions");
+        } else if (error.message.includes("violates row-level security policy")) {
+          toast.error("Security policy violation: Contact administrator");
+        } else {
+          toast.error("Failed to start shift: " + error.message);
+        }
+        
         throw error;
       }
 
