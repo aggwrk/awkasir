@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CalendarClock, Play } from "lucide-react";
 import { StartShiftDialog } from "@/components/StartShiftDialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { useShift } from "@/contexts/ShiftContext";
 import { toast } from "sonner";
 
 const Shifts = () => {
   const { user } = useAuth();
+  const { refetchShift } = useShift();
   const [isStartShiftDialogOpen, setIsStartShiftDialogOpen] = useState(false);
   
   const { data: shifts = [], isLoading, refetch } = useQuery({
@@ -133,6 +134,7 @@ const Shifts = () => {
         onOpenChange={setIsStartShiftDialogOpen}
         onSuccess={() => {
           refetch();
+          refetchShift();
           setIsStartShiftDialogOpen(false);
         }}
       />

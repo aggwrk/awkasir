@@ -1,21 +1,18 @@
 
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { StartShiftDialog } from "@/components/StartShiftDialog";
+import { useState } from "react";
 import { ReceiptDialog } from "@/components/ReceiptDialog";
 import ProductsPanel from "@/components/pos/ProductsPanel";
 import CartPanel from "@/components/pos/CartPanel";
 import { useCart } from "@/hooks/useCart";
 import { useCheckout } from "@/hooks/useCheckout";
+import { ShiftManager } from "@/components/ShiftManager";
+import { useShift } from "@/contexts/ShiftContext";
 
 const PosScreen = () => {
-  const { user } = useAuth();
-  const [activeShift, setActiveShift] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [isStartShiftDialogOpen, setIsStartShiftDialogOpen] = useState(false);
+  
+  const { activeShift } = useShift();
 
   const {
     cart,
@@ -37,51 +34,13 @@ const PosScreen = () => {
     handlePrint
   } = useCheckout(cart, calculateGrandTotal, calculateTax, clearCart);
 
-  // Check for active shift
-  const { data: shiftData, refetch: refetchShift } = useQuery({
-    queryKey: ['activeShift', user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-      
-      const { data, error } = await supabase
-        .from('shifts')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .order('start_time', { ascending: false })
-        .limit(1);
-        
-      if (error) {
-        return null;
-      }
-      
-      return data?.length > 0 ? data[0] : null;
-    },
-    enabled: !!user
-  });
-
-  useEffect(() => {
-    setActiveShift(shiftData);
-    
-    if (!shiftData) {
-      setIsStartShiftDialogOpen(true);
-    }
-  }, [shiftData]);
-
   const onCheckout = async () => {
     await handleCheckout(activeShift);
   };
 
   return (
     <div className="h-full">
-      <StartShiftDialog 
-        open={isStartShiftDialogOpen} 
-        onOpenChange={setIsStartShiftDialogOpen}
-        onSuccess={() => {
-          refetchShift();
-          setIsStartShiftDialogOpen(false);
-        }} 
-      />
+      <ShiftManager />
       
       <ReceiptDialog
         open={isReceiptDialogOpen}
