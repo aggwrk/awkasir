@@ -25,6 +25,8 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       if (!user) return null;
       
+      console.log("Fetching active shift for user:", user.id);
+      
       const { data, error } = await supabase
         .from('shifts')
         .select('*')
@@ -38,23 +40,32 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
         return null;
       }
       
+      console.log("Active shift data:", data);
       return data?.length > 0 ? data[0] : null;
     },
     enabled: !!user
   });
 
   useEffect(() => {
-    setActiveShift(shiftData);
-    
-    if (!shiftData) {
-      setIsStartShiftDialogOpen(true);
+    if (shiftData !== undefined) {
+      console.log("Setting active shift:", shiftData);
+      setActiveShift(shiftData);
+      
+      // Only open the dialog if there's no active shift and we've completed the query
+      if (!shiftData && !isLoading) {
+        setIsStartShiftDialogOpen(true);
+      }
     }
-  }, [shiftData]);
+  }, [shiftData, isLoading]);
 
   const endShift = async () => {
-    if (!activeShift) return;
+    if (!activeShift) {
+      console.error("No active shift to end");
+      return;
+    }
 
     try {
+      console.log("Ending shift:", activeShift.id);
       const { error } = await supabase
         .from('shifts')
         .update({
@@ -63,8 +74,12 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
         })
         .eq('id', activeShift.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error ending shift:", error);
+        throw error;
+      }
       
+      console.log("Shift ended successfully");
       await refetchShift();
       setIsStartShiftDialogOpen(true);
     } catch (error) {

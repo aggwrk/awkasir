@@ -33,14 +33,37 @@ export const StartShiftDialog = ({ open, onOpenChange, onSuccess }: StartShiftDi
     setIsLoading(true);
 
     try {
-      // Ensure we're using authenticated user ID
+      console.log("Starting shift for user:", user.id);
+      
+      // First check if there are any active shifts
+      const { data: existingShifts, error: checkError } = await supabase
+        .from('shifts')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .limit(1);
+        
+      if (checkError) {
+        console.error("Error checking existing shifts:", checkError);
+        throw checkError;
+      }
+      
+      if (existingShifts && existingShifts.length > 0) {
+        toast.info("You already have an active shift");
+        onSuccess(); // Close dialog and refresh
+        setIsLoading(false);
+        return;
+      }
+      
+      // Create new shift
+      const currentTime = new Date().toISOString();
       const { data, error } = await supabase
         .from('shifts')
         .insert({
           user_id: user.id,
           starting_cash: parseFloat(startingCash),
           status: 'active',
-          start_time: new Date().toISOString()
+          start_time: currentTime
         })
         .select();
 
@@ -58,6 +81,7 @@ export const StartShiftDialog = ({ open, onOpenChange, onSuccess }: StartShiftDi
         throw error;
       }
 
+      console.log("Shift started successfully:", data);
       toast.success("Shift started successfully");
       setStartingCash("");
       onSuccess();
