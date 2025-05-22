@@ -1,8 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShoppingCart, Printer, PlusCircle, MinusCircle, Trash2 } from "lucide-react";
+import { ShoppingCart, PlusCircle, MinusCircle, Trash2 } from "lucide-react";
 
 interface Product {
   id: string;
@@ -44,7 +43,6 @@ const CartPanel = ({
   calculateTax,
   calculateGrandTotal,
   handleCheckout,
-  handlePrint,
 }: CartPanelProps) => {
   return (
     <Card className="h-full">
@@ -128,25 +126,14 @@ const CartPanel = ({
             <span>${calculateGrandTotal().toFixed(2)}</span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 w-full">
-          <Button 
-            className="w-full" 
-            variant="outline"
-            onClick={handlePrint}
-            disabled={cart.length === 0}
-          >
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
-          <Button 
-            className="w-full" 
-            onClick={handleCheckout}
-            disabled={cart.length === 0 || !activeShift}
-          >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            Checkout
-          </Button>
-        </div>
+        <Button 
+          className="w-full" 
+          onClick={handleCheckout}
+          disabled={cart.length === 0 || !activeShift}
+        >
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          Checkout
+        </Button>
       </CardFooter>
     </Card>
   );

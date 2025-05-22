@@ -62,6 +62,26 @@ const Reports = () => {
     }
   });
 
+  // Fetch product information to map IDs to names
+  const { data: productsData } = useQuery({
+    queryKey: ['productsForReports'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('id, name');
+        
+      if (error) {
+        console.error("Error fetching products:", error);
+        return [];
+      }
+      
+      return data.reduce((acc: Record<string, string>, product) => {
+        acc[product.id] = product.name;
+        return acc;
+      }, {});
+    }
+  });
+
   // Process sales data for charts
   const processSalesData = () => {
     if (!salesData) return { dailySales: [], paymentMethodData: [], topProducts: [] };
@@ -98,7 +118,12 @@ const Reports = () => {
     salesData.forEach((sale: any) => {
       sale.sale_items.forEach((item: any) => {
         if (!products[item.product_id]) {
-          products[item.product_id] = { id: item.product_id, quantity: 0, revenue: 0 };
+          products[item.product_id] = { 
+            id: item.product_id, 
+            name: productsData?.[item.product_id] || `Product ${item.product_id.substring(0,8)}...`,
+            quantity: 0, 
+            revenue: 0 
+          };
         }
         products[item.product_id].quantity += item.quantity;
         products[item.product_id].revenue += parseFloat(item.subtotal.toString());
@@ -276,10 +301,10 @@ const Reports = () => {
                       <XAxis type="number" />
                       <YAxis 
                         type="category" 
-                        dataKey="id" 
-                        tickFormatter={(id) => {
-                          // In a real app, you would fetch product names here
-                          return `Product ${id.substring(0, 8)}...`;
+                        dataKey="name" 
+                        width={150}
+                        tickFormatter={(name) => {
+                          return name.length > 20 ? `${name.substring(0, 20)}...` : name;
                         }}
                       />
                       <Tooltip 

@@ -32,7 +32,6 @@ const PosScreen = () => {
     isReceiptDialogOpen,
     setIsReceiptDialogOpen,
     handleCheckout,
-    handlePrint
   } = useCheckout(cart, calculateGrandTotal, calculateTax, clearCart);
 
   const onCheckout = async () => {
@@ -79,7 +78,7 @@ const PosScreen = () => {
             calculateTax={calculateTax}
             calculateGrandTotal={calculateGrandTotal}
             handleCheckout={onCheckout}
-            handlePrint={handlePrint}
+            handlePrint={() => {}}
           />
         </div>
       </div>
