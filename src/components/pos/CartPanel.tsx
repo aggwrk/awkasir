@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -30,7 +31,6 @@ interface CartPanelProps {
   calculateTax: () => number;
   calculateGrandTotal: () => number;
   handleCheckout: () => void;
-  handlePrint: () => void;
 }
 
 const CartPanel = ({

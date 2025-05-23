@@ -78,7 +78,6 @@ const PosScreen = () => {
             calculateTax={calculateTax}
             calculateGrandTotal={calculateGrandTotal}
             handleCheckout={onCheckout}
-            handlePrint={() => {}}
           />
         </div>
       </div>
