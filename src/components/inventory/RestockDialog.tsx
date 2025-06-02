@@ -80,6 +80,19 @@ export const RestockDialog = ({ product, open, onOpenChange, onSuccess }: Restoc
         return;
       }
 
+      // Get current stock quantity
+      const { data: currentProduct, error: fetchError } = await supabase
+        .from("products")
+        .select("stock_quantity")
+        .eq("id", productId)
+        .single();
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      const newStockQuantity = currentProduct.stock_quantity + quantityNum;
+
       // 1. Add inventory transaction
       const { error: transactionError } = await supabase.from("inventory_transactions").insert({
         product_id: productId,
@@ -96,9 +109,8 @@ export const RestockDialog = ({ product, open, onOpenChange, onSuccess }: Restoc
       // 2. Update product stock
       const { error: updateError } = await supabase
         .from("products")
-        .update({ stock_quantity: supabase.rpc('increment', { x: quantityNum }) })
-        .eq("id", productId)
-        .select();
+        .update({ stock_quantity: newStockQuantity })
+        .eq("id", productId);
 
       if (updateError) {
         throw updateError;
