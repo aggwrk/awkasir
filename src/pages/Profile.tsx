@@ -17,6 +17,11 @@ const Profile = () => {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!newPassword || !confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       toast.error("New passwords don't match");
       return;
@@ -42,12 +47,24 @@ const Profile = () => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (error: any) {
-      toast.error(`Failed to update password: ${error.message}`);
       console.error("Password update error:", error);
+      toast.error(`Failed to update password: ${error.message}`);
     } finally {
       setIsUpdating(false);
     }
   };
+
+  if (!user) {
+    return (
+      <div className="container mx-auto p-6 max-w-2xl">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-gray-500">Please log in to access your profile.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 max-w-2xl">
@@ -63,7 +80,7 @@ const Profile = () => {
           <div className="space-y-2">
             <Label>Email</Label>
             <Input 
-              value={user?.email || ""} 
+              value={user.email || ""} 
               disabled 
               className="bg-gray-100"
             />
