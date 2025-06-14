@@ -134,13 +134,15 @@ const PosLayout = () => {
         
         <div className="absolute bottom-0 w-full md:w-64 p-4 border-t border-gray-800">
           <div className="flex flex-col space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
+            <NavLink 
+              to="/pos/profile"
+              className={({ isActive }) => 
+                `flex items-center p-2 rounded-md ${isActive ? 'bg-gray-800 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`
+              }
             >
               <User className="mr-2 h-5 w-5" />
               <span>Profile</span>
-            </Button>
+            </NavLink>
             
             <Button 
               variant="ghost" 
