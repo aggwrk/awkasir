@@ -88,7 +88,7 @@ export const EditProductDialog = ({ product, open, onOpenChange }: EditProductDi
         name: product.name || "",
         price: product.price?.toString() || "",
         cost_price: product.cost_price?.toString() || "",
-        category_id: product.category_id || "",
+        category_id: product.category_id || "no-category",
         stock_quantity: product.stock_quantity?.toString() || "",
         barcode: product.barcode || "",
         description: product.description || "",
@@ -108,7 +108,7 @@ export const EditProductDialog = ({ product, open, onOpenChange }: EditProductDi
           name: values.name,
           price: parseFloat(values.price),
           cost_price: values.cost_price ? parseFloat(values.cost_price) : null,
-          category_id: values.category_id || null,
+          category_id: values.category_id === "no-category" ? null : values.category_id || null,
           stock_quantity: parseInt(values.stock_quantity),
           barcode: values.barcode || null,
           description: values.description || null,
@@ -201,7 +201,7 @@ export const EditProductDialog = ({ product, open, onOpenChange }: EditProductDi
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">No Category</SelectItem>
+                        <SelectItem value="no-category">No Category</SelectItem>
                         {categories.map((category: any) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
