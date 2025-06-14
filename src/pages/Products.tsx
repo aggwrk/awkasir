@@ -1,17 +1,22 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Package, Plus } from "lucide-react";
+import { Search, Package, Plus, Trash2 } from "lucide-react";
 import { AddProductDialog } from "@/components/AddProductDialog";
+import { EditProductDialog } from "@/components/EditProductDialog";
+import { toast } from "sonner";
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState<any | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['allProducts', searchTerm],
@@ -35,11 +40,42 @@ const Products = () => {
     }
   });
 
+  const handleEditProduct = (product: any) => {
+    setEditProduct(product);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteProductsWithoutImages = async () => {
+    try {
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .or("image_url.is.null,image_url.eq.");
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Products without images deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["allProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch (error: any) {
+      toast.error(`Failed to delete products: ${error.message}`);
+      console.error("Delete products error:", error);
+    }
+  };
+
   return (
     <>
       <AddProductDialog 
         open={isAddProductDialogOpen} 
         onOpenChange={setIsAddProductDialogOpen} 
+      />
+      
+      <EditProductDialog
+        product={editProduct}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
       />
       
       <Card>
@@ -60,6 +96,14 @@ const Products = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            <Button 
+              variant="destructive"
+              onClick={handleDeleteProductsWithoutImages}
+              size="sm"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete No Images
+            </Button>
             <Button onClick={() => setIsAddProductDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Add Product
@@ -82,13 +126,14 @@ const Products = () => {
                     <TableHead>Cost</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Barcode</TableHead>
+                    <TableHead>Image</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {products.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="h-24 text-center">
+                      <TableCell colSpan={8} className="h-24 text-center">
                         <div className="flex flex-col items-center justify-center text-gray-500">
                           <Package className="h-8 w-8 mb-2" />
                           <p>No products found</p>
@@ -108,8 +153,21 @@ const Products = () => {
                           </span>
                         </TableCell>
                         <TableCell>{product.barcode || '—'}</TableCell>
+                        <TableCell>
+                          {product.image_url ? (
+                            <span className="text-green-600">✓</span>
+                          ) : (
+                            <span className="text-red-500">✗</span>
+                          )}
+                        </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">Edit</Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleEditProduct(product)}
+                          >
+                            Edit
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))
