@@ -42,7 +42,6 @@ const editProductSchema = z.object({
   stock_quantity: z.string().min(0, "Stock quantity must be 0 or greater"),
   barcode: z.string().optional(),
   description: z.string().optional(),
-  image_url: z.string().optional(),
 });
 
 interface EditProductDialogProps {
@@ -65,7 +64,6 @@ export const EditProductDialog = ({ product, open, onOpenChange }: EditProductDi
       stock_quantity: "",
       barcode: "",
       description: "",
-      image_url: "",
     },
   });
 
@@ -94,7 +92,6 @@ export const EditProductDialog = ({ product, open, onOpenChange }: EditProductDi
         stock_quantity: product.stock_quantity?.toString() || "",
         barcode: product.barcode || "",
         description: product.description || "",
-        image_url: product.image_url || "",
       });
     }
   }, [product, open, form]);
@@ -115,7 +112,6 @@ export const EditProductDialog = ({ product, open, onOpenChange }: EditProductDi
           stock_quantity: parseInt(values.stock_quantity),
           barcode: values.barcode || null,
           description: values.description || null,
-          image_url: values.image_url || null,
         })
         .eq("id", product.id);
 
@@ -255,20 +251,6 @@ export const EditProductDialog = ({ product, open, onOpenChange }: EditProductDi
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Enter product description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="image_url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Image URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter image URL" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

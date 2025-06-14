@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Package, Plus, Trash2 } from "lucide-react";
+import { Search, Package, Plus, Trash2, Edit } from "lucide-react";
 import { AddProductDialog } from "@/components/AddProductDialog";
 import { EditProductDialog } from "@/components/EditProductDialog";
 import { toast } from "sonner";
@@ -148,14 +148,13 @@ const Products = () => {
                     <TableHead>Cost</TableHead>
                     <TableHead>Stock</TableHead>
                     <TableHead>Barcode</TableHead>
-                    <TableHead>Image</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {products.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="h-24 text-center">
+                      <TableCell colSpan={7} className="h-24 text-center">
                         <div className="flex flex-col items-center justify-center text-gray-500">
                           <Package className="h-8 w-8 mb-2" />
                           <p>No products found</p>
@@ -175,13 +174,6 @@ const Products = () => {
                           </span>
                         </TableCell>
                         <TableCell>{product.barcode || '—'}</TableCell>
-                        <TableCell>
-                          {product.image_url ? (
-                            <span className="text-green-600">✓</span>
-                          ) : (
-                            <span className="text-red-500">✗</span>
-                          )}
-                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex gap-2 justify-end">
                             <Button 
@@ -189,7 +181,7 @@ const Products = () => {
                               size="sm"
                               onClick={() => handleEditProduct(product)}
                             >
-                              Edit
+                              <Edit className="h-4 w-4" />
                             </Button>
                             <Button 
                               variant="ghost" 
