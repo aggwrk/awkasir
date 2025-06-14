@@ -16,6 +16,7 @@ const Products = () => {
   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<any | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: products = [], isLoading } = useQuery({
@@ -45,23 +46,27 @@ const Products = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteProductsWithoutImages = async () => {
+  const handleDeleteProduct = async (productId: string) => {
+    setDeletingProductId(productId);
+    
     try {
       const { error } = await supabase
         .from("products")
         .delete()
-        .or("image_url.is.null,image_url.eq.");
+        .eq("id", productId);
 
       if (error) {
         throw error;
       }
 
-      toast.success("Products without images deleted successfully!");
+      toast.success("Product deleted successfully!");
       queryClient.invalidateQueries({ queryKey: ["allProducts"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error: any) {
-      toast.error(`Failed to delete products: ${error.message}`);
-      console.error("Delete products error:", error);
+      toast.error(`Failed to delete product: ${error.message}`);
+      console.error("Delete product error:", error);
+    } finally {
+      setDeletingProductId(null);
     }
   };
 
@@ -96,14 +101,6 @@ const Products = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button 
-              variant="destructive"
-              onClick={handleDeleteProductsWithoutImages}
-              size="sm"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete No Images
-            </Button>
             <Button onClick={() => setIsAddProductDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Add Product
@@ -161,13 +158,27 @@ const Products = () => {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleEditProduct(product)}
-                          >
-                            Edit
-                          </Button>
+                          <div className="flex gap-2 justify-end">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleEditProduct(product)}
+                            >
+                              Edit
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              disabled={deletingProductId === product.id}
+                            >
+                              {deletingProductId === product.id ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-primary"></div>
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
