@@ -47,6 +47,10 @@ const Products = () => {
   };
 
   const handleDeleteProduct = async (productId: string) => {
+    if (!confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
+      return;
+    }
+
     setDeletingProductId(productId);
     
     try {

@@ -10,7 +10,6 @@ import { toast } from "sonner";
 
 const Profile = () => {
   const { user } = useAuth();
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
@@ -40,7 +39,6 @@ const Profile = () => {
       }
 
       toast.success("Password updated successfully!");
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error: any) {
@@ -75,18 +73,6 @@ const Profile = () => {
           {/* Change Password */}
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter current password"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
               <Input
                 id="newPassword"
@@ -114,7 +100,7 @@ const Profile = () => {
 
             <Button 
               type="submit" 
-              disabled={isUpdating || !currentPassword || !newPassword || !confirmPassword}
+              disabled={isUpdating || !newPassword || !confirmPassword}
               className="w-full"
             >
               {isUpdating ? "Updating..." : "Update Password"}
