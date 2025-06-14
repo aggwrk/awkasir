@@ -54,13 +54,34 @@ const Products = () => {
     setDeletingProductId(productId);
     
     try {
-      const { error } = await supabase
+      // First, delete all inventory transactions for this product
+      const { error: inventoryError } = await supabase
+        .from("inventory_transactions")
+        .delete()
+        .eq("product_id", productId);
+
+      if (inventoryError) {
+        throw inventoryError;
+      }
+
+      // Then, delete all sale items for this product
+      const { error: saleItemsError } = await supabase
+        .from("sale_items")
+        .delete()
+        .eq("product_id", productId);
+
+      if (saleItemsError) {
+        throw saleItemsError;
+      }
+
+      // Finally, delete the product
+      const { error: productError } = await supabase
         .from("products")
         .delete()
         .eq("id", productId);
 
-      if (error) {
-        throw error;
+      if (productError) {
+        throw productError;
       }
 
       toast.success("Product deleted successfully!");
