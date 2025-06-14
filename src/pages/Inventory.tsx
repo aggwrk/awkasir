@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowUpDown, PlusCircle, MinusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { RestockDialog } from "@/components/inventory/RestockDialog";
@@ -84,97 +85,103 @@ const Inventory = () => {
         onSuccess={handleInventoryUpdate}
       />
       
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle className="text-2xl">Inventory Management</CardTitle>
-              <CardDescription>
-                Track and manage your stock levels
-              </CardDescription>
+      <div className="h-full flex flex-col">
+        <Card className="flex-1 flex flex-col">
+          <CardHeader className="flex-shrink-0">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              <div>
+                <CardTitle className="text-2xl">Inventory Management</CardTitle>
+                <CardDescription>
+                  Track and manage your stock levels
+                </CardDescription>
+              </div>
+              <div className="flex space-x-2 mt-4 md:mt-0">
+                <Button onClick={() => openRestockDialog(null)}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Restock
+                </Button>
+                <Button variant="outline" onClick={() => openAdjustDialog(null)}>
+                  <MinusCircle className="mr-2 h-4 w-4" />
+                  Adjust
+                </Button>
+              </div>
             </div>
-            <div className="flex space-x-2 mt-4 md:mt-0">
-              <Button onClick={() => openRestockDialog(null)}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Restock
-              </Button>
-              <Button variant="outline" onClick={() => openAdjustDialog(null)}>
-                <MinusCircle className="mr-2 h-4 w-4" />
-                Adjust
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
-                      <div className="flex items-center">
-                        Product
-                        {sortBy === 'name' && (
-                          <ArrowUpDown className="ml-2 h-4 w-4" />
-                        )}
-                      </div>
-                    </TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="cursor-pointer" onClick={() => handleSort('stock_quantity')}>
-                      <div className="flex items-center">
-                        Current Stock
-                        {sortBy === 'stock_quantity' && (
-                          <ArrowUpDown className="ml-2 h-4 w-4" />
-                        )}
-                      </div>
-                    </TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {inventory.map((item: any) => {
-                    const status = getStockStatus(item.stock_quantity);
-                    return (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.name}</TableCell>
-                        <TableCell>{item.categories?.name || 'Uncategorized'}</TableCell>
-                        <TableCell>{item.stock_quantity}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant="outline"
-                            className={`
-                              ${status.color === 'red' ? 'bg-red-50 text-red-700 border-red-200' : ''}
-                              ${status.color === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' : ''}
-                              ${status.color === 'green' ? 'bg-green-50 text-green-700 border-green-200' : ''}
-                              ${status.color === 'gray' ? 'bg-gray-50 text-gray-700 border-gray-200' : ''}
-                            `}
-                          >
-                            {status.label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => openRestockDialog(item)}
-                          >
-                            Update Stock
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent className="flex-1 flex flex-col p-0">
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <ScrollArea className="flex-1">
+                <div className="p-6">
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
+                            <div className="flex items-center">
+                              Product
+                              {sortBy === 'name' && (
+                                <ArrowUpDown className="ml-2 h-4 w-4" />
+                              )}
+                            </div>
+                          </TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead className="cursor-pointer" onClick={() => handleSort('stock_quantity')}>
+                            <div className="flex items-center">
+                              Current Stock
+                              {sortBy === 'stock_quantity' && (
+                                <ArrowUpDown className="ml-2 h-4 w-4" />
+                              )}
+                            </div>
+                          </TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {inventory.map((item: any) => {
+                          const status = getStockStatus(item.stock_quantity);
+                          return (
+                            <TableRow key={item.id}>
+                              <TableCell className="font-medium">{item.name}</TableCell>
+                              <TableCell>{item.categories?.name || 'Uncategorized'}</TableCell>
+                              <TableCell>{item.stock_quantity}</TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant="outline"
+                                  className={`
+                                    ${status.color === 'red' ? 'bg-red-50 text-red-700 border-red-200' : ''}
+                                    ${status.color === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' : ''}
+                                    ${status.color === 'green' ? 'bg-green-50 text-green-700 border-green-200' : ''}
+                                    ${status.color === 'gray' ? 'bg-gray-50 text-gray-700 border-gray-200' : ''}
+                                  `}
+                                >
+                                  {status.label}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => openRestockDialog(item)}
+                                >
+                                  Update Stock
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </ScrollArea>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 };

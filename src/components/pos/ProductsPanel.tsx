@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import ProductCard from "@/components/ProductCard";
 
 interface Product {
@@ -90,8 +91,8 @@ const ProductsPanel = ({
   }, [categoriesData]);
 
   return (
-    <Card className="h-full">
-      <CardHeader>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="flex-shrink-0">
         <div className="flex justify-between items-center">
           <CardTitle>Products</CardTitle>
           <div className="relative w-64">
@@ -129,21 +130,25 @@ const ProductsPanel = ({
           </TabsList>
         </Tabs>
       </CardHeader>
-      <CardContent className="overflow-y-auto max-h-[calc(100vh-320px)]">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.map(product => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
-              onAddToCart={() => addToCart(product)} 
-            />
-          ))}
-          {products.length === 0 && (
-            <div className="col-span-full text-center py-10 text-gray-500">
-              No products found
+      <CardContent className="flex-1 p-0">
+        <ScrollArea className="h-full">
+          <div className="p-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {products.map(product => (
+                <ProductCard 
+                  key={product.id} 
+                  product={product} 
+                  onAddToCart={() => addToCart(product)} 
+                />
+              ))}
+              {products.length === 0 && (
+                <div className="col-span-full text-center py-10 text-gray-500">
+                  No products found
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );

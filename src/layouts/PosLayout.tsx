@@ -58,13 +58,14 @@ const PosLayout = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
-      <div className="bg-gray-900 text-white w-full md:w-64 flex-shrink-0">
+      <div className="bg-gray-900 text-white w-full md:w-64 flex-shrink-0 flex flex-col">
         <div className="p-4 border-b border-gray-800">
           <h1 className="text-xl font-bold">Grocery POS</h1>
           <p className="text-sm text-gray-400">{user?.email}</p>
         </div>
         
-        <div className="p-4">
+        {/* Navigation - flex-1 to take remaining space */}
+        <div className="p-4 flex-1 overflow-y-auto">
           <div className="space-y-2">
             <NavLink 
               to="/"
@@ -132,7 +133,8 @@ const PosLayout = () => {
           </div>
         </div>
         
-        <div className="absolute bottom-0 w-full md:w-64 p-4 border-t border-gray-800">
+        {/* Fixed bottom section for Profile and Sign Out */}
+        <div className="p-4 border-t border-gray-800 flex-shrink-0">
           <div className="flex flex-col space-y-2">
             <NavLink 
               to="/pos/profile"
@@ -157,9 +159,11 @@ const PosLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <div className="p-6">
-          <Outlet />
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-auto">
+          <div className="p-6">
+            <Outlet />
+          </div>
         </div>
       </div>
     </div>
